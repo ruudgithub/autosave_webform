@@ -1,0 +1,10 @@
+#autosave_webform_message div { display: inline; }
+#autosave_webform_message {
+    display: inline-block;
+    background-color: #4d8f46;
+    color: white;
+    padding: 4px 12px;
+}
+#autosave-webform-wrapper {
+    display: none;
+}

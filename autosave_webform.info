@@ -1,0 +1,7 @@
+name = Autosave webform
+description = This Module periodically saves the state of your webform remotely.
+package = Webform
+
+dependencies[] = jquery_update
+
+core = 7.x
