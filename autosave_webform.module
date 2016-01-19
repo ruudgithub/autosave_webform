@@ -1,16 +1,17 @@
 <?php
 /**
+ * @file
+ * Implementation of the autosave functionality.
+ *
  * @author Jaap Jansma (CiviCooP) <jaap.jansma@civicoop.org>
+ *
  * @license http://www.gnu.org/licenses/agpl-3.0.html
  */
 
 require_once('autosave_webform.webform.inc');
 
 /**
- * Implements hook_node_load
- *
- * @param $nodes
- * @param $types
+ * Implements hook_node_load().
  */
 function autosave_webform_node_load($nodes, $types) {
     _autosave_webform_webform_node_load($nodes, $types);
@@ -18,8 +19,6 @@ function autosave_webform_node_load($nodes, $types) {
 
 /**
  * Implements hook_node_insert().
- *
- * @param object $node
  */
 function autosave_webform_node_insert($node) {
     _autosave_webform_webform_node_insert($node);
@@ -27,17 +26,13 @@ function autosave_webform_node_insert($node) {
 
 /**
  * Implements hook_node_update().
- *
- * @param object $node
  */
 function autosave_webform_node_update($node) {
     _autosave_webform_webform_node_update($node);
 }
 
-/*
+/**
  * Implements hook_node_delete().
- *
- * @param object $node
  */
 function autosave_webform_node_delete($node) {
     _autosave_webform_webform_node_delete($node);
