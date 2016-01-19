@@ -27,10 +27,10 @@
  */
 function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $forms['webform_client_form_1'] = array(
-    //Set this to true when you don't want a clear saved
-    //data on the submitting of your form.
+    // Set this to true when you don't want a clear saved
+    // data on the submitting of your form.
     'no-submit-handler' => FALSE,
-    //Set this to false if you don't want to autoload stored data on your form.
+    // Set this to false if you don't want to autoload stored data on your form.
     'auto-restore' => TRUE,
   );
   return $forms;
