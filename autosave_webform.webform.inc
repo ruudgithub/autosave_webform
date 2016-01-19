@@ -1,6 +1,9 @@
 <?php
-
 /**
+ * @file
+ *
+ * This file contains the functionality to enable autosaving for webforms.
+ *
  * @author Jaap Jansma (CiviCooP) <jaap.jansma@civicoop.org>
  * @license http://www.gnu.org/licenses/agpl-3.0.html
  */
@@ -8,7 +11,7 @@
 /**
  * Alter the form_state and form after a restore has taken place.
  *
- * The $data contains the restored data and can be used to alter the $form_state
+ * The $data contains the restored data and can be used to alter the $form_state.
  *
  * @param $form
  * @param $form_id
@@ -30,7 +33,7 @@ function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form
 }
 
 /**
- * Alter the data before saving it
+ * Alter the data before saving it.
  *
  * You can use this hook to add additional data for storing.
  *
@@ -56,7 +59,7 @@ function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_st
 /**
  * Alter the list of forms configured for autosaving.
  *
- * To enable alter saving at a form add the form_id to the array of $form;
+ * To enable alter saving at a form add the form_id to the array of $form.
  *
  * @param $forms array
  * @param $form
@@ -73,6 +76,13 @@ function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, 
     return $forms;
 }
 
+/**
+ * Adds a checkbox to Webform settings page
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
 function autosave_webform_form_webform_configure_form_alter(&$form, $form_state, $form_id) {
     $node = &$form['#node'];
     $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? true : false;

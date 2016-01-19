@@ -1,5 +1,6 @@
 /**
  * @file
+ *
  * This javascript provides the behaviour for autosaving webforms.
  *
  * The file consist of two parts the first part attach the behaviour to drupal forms.
@@ -97,7 +98,6 @@
         }
       };
     })();
-
 
     $.autosave_webform = function () {
       return $autosave_webform.getInstance();

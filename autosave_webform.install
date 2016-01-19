@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ *
+ * This file contains the hooks for installation of this module.
+ */
 
 /**
  * Implements hook_schema()

@@ -1,5 +1,9 @@
 <?php
 /**
+ * @file
+ *
+ * This file contains the api documentation and example of the module autosave_webform.
+ *
  * @author Jaap Jansma (CiviCooP) <jaap.jansma@civicoop.org>
  * @license http://www.gnu.org/licenses/agpl-3.0.html
  */
