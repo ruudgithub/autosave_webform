@@ -95,7 +95,7 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Submit handler for forms.
  *
- * Clears the saved data
+ * Clears the saved data.
  *
  * @param array $form
  *    The form.
@@ -108,7 +108,7 @@ function autosave_webform_form_submit(array $form, array &$form_state) {
 }
 
 /**
- * Restore the previous saved values
+ * Restore the previous saved values.
  *
  * @param array $form
  *    The form.
@@ -190,7 +190,8 @@ function autosave_webform_get_saved_data($form_id, $uid) {
  *    The form state.
  *
  * @return array|bool
- *    Returns false when the form is not saveable. Returns an array with settings when the form is saveable.
+ *    Returns false when the form is not saveable.
+ *    Returns an array with settings when the form is saveable.
  */
 function autosave_webform_is_form_autosaveable(array $form, $form_id, array $form_state) {
   $valid_form_ids = array();
@@ -209,11 +210,11 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
   if (in_array($form_id, $valid_form_ids)) {
     return $defaults;
   }
-  return false;
+  return FALSE;
 }
 
 /**
- * Ajax callback for autosaving the form
+ * Ajax callback for autosaving the form.
  *
  * @param array $form
  *    The form.
@@ -234,7 +235,7 @@ function autosave_webform_ajax_callback(array $form, array &$form_state) {
 }
 
 /**
- * Save the form
+ * Save the form.
  *
  * @param array $form
  *    The form.
