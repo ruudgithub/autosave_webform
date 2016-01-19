@@ -8,183 +8,184 @@
  * @license http://www.gnu.org/licenses/agpl-3.0.html
  */
 
-require_once('autosave_webform.webform.inc');
+require_once 'autosave_webform.webform.inc';
 
 /**
  * Implements hook_node_load().
  */
 function autosave_webform_node_load($nodes, $types) {
-    _autosave_webform_webform_node_load($nodes, $types);
+  _autosave_webform_webform_node_load($nodes, $types);
 }
 
 /**
  * Implements hook_node_insert().
  */
 function autosave_webform_node_insert($node) {
-    _autosave_webform_webform_node_insert($node);
+  _autosave_webform_webform_node_insert($node);
 }
 
 /**
  * Implements hook_node_update().
  */
 function autosave_webform_node_update($node) {
-    _autosave_webform_webform_node_update($node);
+  _autosave_webform_webform_node_update($node);
 }
 
 /**
  * Implements hook_node_delete().
  */
 function autosave_webform_node_delete($node) {
-    _autosave_webform_webform_node_delete($node);
+  _autosave_webform_webform_node_delete($node);
 }
 
 /**
  * Implements hook_form_alter().
  */
 function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
-    if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
-        //add the necessary javascript
-        $settings = array(
-            'form_id' => str_replace('_', '-', $form_id),
-            'autosave_button' => '.autosave-button',
-            'timeout' => 15,
-        );
-        drupal_add_js(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.js');
-        drupal_add_js(array('autosave_webform' => $settings), 'setting');
-        drupal_add_css(drupal_get_path('module', 'autosave_webform').'/autosave_webform.css');
+  if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
+    //add the necessary javascript
+    $settings = array(
+      'form_id' => str_replace('_', '-', $form_id),
+      'autosave_button' => '.autosave-button',
+      'timeout' => 15,
+    );
+    drupal_add_js(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.js');
+    drupal_add_js(array('autosave_webform' => $settings), 'setting');
+    drupal_add_css(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.css');
 
-        //add a button for save draft
-        $form['buttons']['autosave'] = array(
-            '#prefix' => '<div id="autosave-webform-wrapper">',
-            '#suffix' => '</div>',
-        );
-        $form['buttons']['autosave']['autosave_button'] = array(
-            '#type' => 'submit',
-            '#value' => t('Save draft'),
-            '#validate' => array(),
-            '#limit_validation_errors' => array(),
-            '#attributes' => array(
-                'class' => array('autosave-button'),
-            ),
-            '#ajax' => array(
-                'wrapper' => str_replace('_', '-', $form_id),
-                'callback' => 'autosave_webform_ajax_callback',
-            ),
-        );
-        $form['actions']['autosave_webform_message'] = array(
-            '#prefix' => '<span id="autosave_webform_message" style="display: none;">',
-            '#suffix' => '</span>',
-            '#markup' => '<div>saved</div>',
-            '#weight' => 100,
-        );
+    //add a button for save draft
+    $form['buttons']['autosave'] = array(
+      '#prefix' => '<div id="autosave-webform-wrapper">',
+      '#suffix' => '</div>',
+    );
+    $form['buttons']['autosave']['autosave_button'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save draft'),
+      '#validate' => array(),
+      '#limit_validation_errors' => array(),
+      '#attributes' => array(
+        'class' => array('autosave-button'),
+      ),
+      '#ajax' => array(
+        'wrapper' => str_replace('_', '-', $form_id),
+        'callback' => 'autosave_webform_ajax_callback',
+      ),
+    );
+    $form['actions']['autosave_webform_message'] = array(
+      '#prefix' => '<span id="autosave_webform_message" style="display: none;">',
+      '#suffix' => '</span>',
+      '#markup' => '<div>saved</div>',
+      '#weight' => 100,
+    );
 
-        if (empty($form_state['input']) && !empty($settings['auto-restore'])) {
-            //restore old data only when the form is not submitted
-            autosave_webform_restore($form, $form_state, $form_id);
-        }
-
-        //add our own submit handler to clear the saved data after a submit
-        if (empty($settings['no-submit-handler'])) {
-            $form['#submit'][] = 'autosave_webform_form_submit';
-        }
+    if (empty($form_state['input']) && !empty($settings['auto-restore'])) {
+      //restore old data only when the form is not submitted
+      autosave_webform_restore($form, $form_state, $form_id);
     }
 
-    return $form;
+    //add our own submit handler to clear the saved data after a submit
+    if (empty($settings['no-submit-handler'])) {
+      $form['#submit'][] = 'autosave_webform_form_submit';
+    }
+  }
+
+  return $form;
 }
 
 function autosave_webform_form_submit($form, &$form_state) {
-    global $user;
-    autosave_webform_clear_saved_data($form_state['build_info']['form_id'], $user->uid);
+  global $user;
+  autosave_webform_clear_saved_data($form_state['build_info']['form_id'], $user->uid);
 }
 
 function autosave_webform_restore($form, &$form_state, $form_id) {
-    global $user;
-    $form_id = str_replace("-", "_", $form_id);
+  global $user;
+  $form_id = str_replace("-", "_", $form_id);
 
-    // Fetch the saved form, if any.
-    $record = autosave_webform_get_saved_data($form_id, $user->uid);
+  // Fetch the saved form, if any.
+  $record = autosave_webform_get_saved_data($form_id, $user->uid);
 
-    if ($record) {
-        $data = unserialize($record->serialized);
-        if (!is_array($data)) {
-            $data = array();
-        }
-        if (isset($data['input']) && isset($data['input']['form_token'])) {
-            unset($data['input']['form_token']);
-        }
-        if (isset($data['input'])) {
-            $form_state['input'] = $data['input'];
-        }
-        $form_state['input']['form_token'] = drupal_get_token($form['#token']);
-
-        drupal_alter('autosavewebform_restore', $form, $form_id, $form_state, $data);
+  if ($record) {
+    $data = unserialize($record->serialized);
+    if (!is_array($data)) {
+      $data = array();
     }
+    if (isset($data['input']) && isset($data['input']['form_token'])) {
+      unset($data['input']['form_token']);
+    }
+    if (isset($data['input'])) {
+      $form_state['input'] = $data['input'];
+    }
+    $form_state['input']['form_token'] = drupal_get_token($form['#token']);
+
+    drupal_alter('autosavewebform_restore', $form, $form_id, $form_state, $data);
+  }
 }
+
 function autosave_webform_clear_saved_data($form_id, $uid) {
-    $result =  db_delete("autosave_webform_forms")
-        ->condition('form_id', str_replace('-', '_', $form_id))
-        ->condition('uid', $uid)
-        ->execute();
+  $result = db_delete("autosave_webform_forms")
+    ->condition('form_id', str_replace('-', '_', $form_id))
+    ->condition('uid', $uid)
+    ->execute();
 }
 
 function autosave_webform_get_saved_data($form_id, $uid) {
-    static $forms = array();
-    if (empty($forms[$form_id][$uid])) {
-        // Fetch the saved form, if any.
-        $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid", array(
-            ':form_id' => str_replace('-', '_', $form_id),
-            ':uid' => $uid,
-        ))->fetchObject();
-    }
-    return $forms[$form_id][$uid];
+  static $forms = array();
+  if (empty($forms[$form_id][$uid])) {
+    // Fetch the saved form, if any.
+    $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid", array(
+      ':form_id' => str_replace('-', '_', $form_id),
+      ':uid' => $uid,
+    ))->fetchObject();
+  }
+  return $forms[$form_id][$uid];
 }
 
 function autosave_webform_is_form_autosaveable($form, $form_id, $form_state) {
-    $valid_form_ids = array();
+  $valid_form_ids = array();
 
-    $valid_form_ids = module_invoke_all('autosavewebform_alter_autosaving_forms', $valid_form_ids, $form, $form_id, $form_state);
+  $valid_form_ids = module_invoke_all('autosavewebform_alter_autosaving_forms', $valid_form_ids, $form, $form_id, $form_state);
 
-    $defaults = array(
-        'no-submit-handler' => false,
-        'auto-restore' => true,
-    );
+  $defaults = array(
+    'no-submit-handler' => false,
+    'auto-restore' => true,
+  );
 
-    if (isset($valid_form_ids[$form_id]) && is_array($valid_form_ids[$form_id])) {
-        return array_merge($defaults, $valid_form_ids[$form_id]);
-    }
+  if (isset($valid_form_ids[$form_id]) && is_array($valid_form_ids[$form_id])) {
+    return array_merge($defaults, $valid_form_ids[$form_id]);
+  }
 
-    if (in_array($form_id, $valid_form_ids)) {
-        return $defaults;
-    }
-    return false;
+  if (in_array($form_id, $valid_form_ids)) {
+    return $defaults;
+  }
+  return false;
 }
 
 function autosave_webform_ajax_callback($form, &$form_state) {
-    autosave_webform_save($form, $form_state);
+  autosave_webform_save($form, $form_state);
 
-    $commands = array();
-    $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
-    $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
-    return array('#type' => 'ajax', '#commands' => $commands);
+  $commands = array();
+  $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
+  $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
+  return array('#type' => 'ajax', '#commands' => $commands);
 
 }
 
 function autosave_webform_save($form, &$form_state) {
-    global $user;
+  global $user;
 
-    $data = array();
-    $data['input'] = $form_state['input'];
-    $form_id = $form_state['build_info']['form_id'];
+  $data = array();
+  $data['input'] = $form_state['input'];
+  $form_id = $form_state['build_info']['form_id'];
 
-    drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
+  drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
 
-    db_merge('autosave_webform_forms')->key(array(
-        'form_id' => $form_id,
-        'uid' => $user->uid,
-    ))
+  db_merge('autosave_webform_forms')->key(array(
+    'form_id' => $form_id,
+    'uid' => $user->uid,
+  ))
     ->fields(array(
-        'timestamp' => time(),
-        'serialized' => serialize($data),
+      'timestamp' => time(),
+      'serialized' => serialize($data),
     ))
     ->execute();
 }
