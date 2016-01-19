@@ -30,13 +30,7 @@
       function init() {
 
         return {
-
-          /**
-           * Set plugin initial options
-           *
-           * @param [Object] options
-           *  Options holds the different options
-           */
+          
           setInitialOptions: function (options) {
             var defaults = {
               timeout: 15,
@@ -48,12 +42,6 @@
             this.options = this.options || $.extend(defaults, options);
           },
 
-          /**
-           * Set plugin options
-           *
-           * @param [Object] options
-           *  Options holds the different options
-           */
           setOptions: function (options) {
             this.options = this.options || this.setInitialOptions(options);
             this.options = $.extend(this.options, options);
