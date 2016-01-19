@@ -78,7 +78,9 @@ function autosave_webform_autosavewebform_save_alter(array &$form, $form_id, arr
  *   The form id.
  * @param array $form_state
  *   The form state.
+ *
  * @return array
+ *  An array with valid form_ids.
  */
 function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $node = &$form['#node'];
@@ -90,7 +92,7 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
 }
 
 /**
- * Adds a checkbox to webform settings page
+ * Adds a checkbox to webform settings page.
  *
  * @param array $form
  *   The form.
@@ -101,13 +103,13 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
  */
 function autosave_webform_form_webform_configure_form_alter(array &$form, array $form_state, $form_id) {
   $node = &$form['#node'];
-  $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? true : false;
+  $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? TRUE : FALSE;
 
   $form['autosave_webform'] = array(
     '#type' => 'fieldset',
     '#title' => t("Autosave webform"),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE
+    '#collapsed' => FALSE,
   );
   $form['autosave_webform']['autosave_webform_enable'] = array(
     '#type' => 'checkbox',
@@ -118,7 +120,13 @@ function autosave_webform_form_webform_configure_form_alter(array &$form, array 
   $form['#submit'][] = 'autosave_webform_form_webform_configure_form_submit';
 }
 
-function _autosave_webform_webform_node_load($nodes, $types) {
+/**
+ * Deferred hook_node_load for webforms.
+ *
+ * @param array $nodes
+ * @param array $types
+ */
+function _autosave_webform_webform_node_load(array &$nodes, array $types) {
   $db = db_query('SELECT * FROM {autosave_webforms} WHERE nid IN(:nids)', array(':nids' => array_keys($nodes)));
   foreach ($db as $autosave_webform) {
     $node = &$nodes[$autosave_webform->nid];
@@ -126,13 +134,26 @@ function _autosave_webform_webform_node_load($nodes, $types) {
   }
 }
 
-function autosave_webform_form_webform_configure_form_submit(&$form, &$form_state)
+/**
+ * Deferred hook_webform_configure_form_submit
+ *
+ * @param array $form
+ * @param array $form_state
+ * @throws Exception
+ */
+function autosave_webform_form_webform_configure_form_submit(array &$form, array &$form_state)
 {
   $node = &$form['#node'];
   $node->autosave_webform_enable = $form_state['input']['autosave_webform_enable'] ? TRUE : FALSE;
   node_save($node);
 }
 
+/**
+ * Deferred hook_webform_node_insert
+ *
+ * @param $node
+ * @throws Exception
+ */
 function _autosave_webform_webform_node_insert($node) {
   if (isset($node->autosave_webform_enable)) {
     db_insert('autosave_webforms')
@@ -144,6 +165,13 @@ function _autosave_webform_webform_node_insert($node) {
   }
 }
 
+/**
+ * Deferred hook_webform_node_insert
+ * 
+ * @param $node
+ * @throws Exception
+ * @throws InvalidMergeQueryException
+ */
 function _autosave_webform_webform_node_update($node) {
   if (isset($node->autosave_webform_enable)) {
     db_merge('autosave_webforms')
