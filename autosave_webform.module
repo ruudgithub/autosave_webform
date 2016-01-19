@@ -47,7 +47,7 @@ function autosave_webform_node_delete($node) {
  * Implements hook_form_alter().
  */
 function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
-    if (autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
+    if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
         //add the neccesary javascript
         $settings = array(
             'form_id' => str_replace('_', '-', $form_id),
@@ -67,6 +67,7 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
             '#type' => 'submit',
             '#value' => t('Save draft'),
             '#validate' => array(),
+            '#limit_validation_errors' => array(),
             '#attributes' => array(
                 'class' => array('autosave-button'),
             ),
@@ -82,13 +83,15 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
             '#weight' => 100,
         );
 
-        if (empty($form_state['input'])) {
+        if (empty($form_state['input']) && !empty($settings['auto-restore'])) {
             //restore old data only when the form is not submitted
             autosave_webform_restore($form, $form_state, $form_id);
         }
 
         //add our own submit handler to clear the saved data after a submit
-        $form['#submit'][] = 'autosave_webform_form_submit';
+        if (empty($settings['no-submit-handler'])) {
+            $form['#submit'][] = 'autosave_webform_form_submit';
+        }
     }
 
     return $form;
@@ -118,9 +121,8 @@ function autosave_webform_restore($form, &$form_state, $form_id) {
             $form_state['input'] = $data['input'];
         }
         $form_state['input']['form_token'] = drupal_get_token($form['#token']);
-        $form_state['rebuild'] = true;
 
-        drupal_alter('autosavewebform_restore_alter', $form, $form_id, $form_state, $data);
+        drupal_alter('autosavewebform_restore', $form, $form_id, $form_state, $data);
     }
 }
 function autosave_webform_clear_saved_data($form_id, $uid) {
@@ -147,20 +149,39 @@ function autosave_webform_is_form_autosaveable($form, $form_id, $form_state) {
 
     $valid_form_ids = module_invoke_all('autosavewebform_alter_autosaving_forms', $valid_form_ids, $form, $form_id, $form_state);
 
+    $defaults = array(
+        'no-submit-handler' => false,
+        'auto-restore' => true,
+    );
+
+    if (isset($valid_form_ids[$form_id]) && is_array($valid_form_ids[$form_id])) {
+        return array_merge($defaults, $valid_form_ids[$form_id]);
+    }
+
     if (in_array($form_id, $valid_form_ids)) {
-        return true;
+        return $defaults;
     }
     return false;
 }
 
 function autosave_webform_ajax_callback($form, &$form_state) {
+    autosave_webform_save($form, $form_state);
+
+    $commands = array();
+    $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
+    $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
+    return array('#type' => 'ajax', '#commands' => $commands);
+
+}
+
+function autosave_webform_save($form, &$form_state) {
     global $user;
 
     $data = array();
     $data['input'] = $form_state['input'];
-    $form_id = $form_state['values']['form_id'];
+    $form_id = $form_state['build_info']['form_id'];
 
-    drupal_alter('autosavewebform_save_alter', $form, $form_id, $form_state, $data);
+    drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
 
     db_merge('autosave_webform_forms')->key(array(
         'form_id' => $form_id,
@@ -171,22 +192,4 @@ function autosave_webform_ajax_callback($form, &$form_state) {
         'serialized' => serialize($data),
     ))
     ->execute();
-
-    $commands = array();
-    $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
-    $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
-    /*$commands[] = ajax_command_invoke('#autosave_webform_message', 'show', array(array(
-        500,
-        'swing',
-        //'autosave_webform_hide_save_message',
-        'function() {
-        console.log("hide");
-            setTimeout(function() {
-                console.log("hide");
-                $("#autosave_webform_message").css("display", "none");
-            }, 3000);
-        }',
-    )));*/
-    return array('#type' => 'ajax', '#commands' => $commands);
-
 }
