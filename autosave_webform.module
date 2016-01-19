@@ -43,7 +43,7 @@ function autosave_webform_node_delete($node) {
  */
 function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
   if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
-    //add the necessary javascript
+    // add the necessary javascript
     $settings = array(
       'form_id' => str_replace('_', '-', $form_id),
       'autosave_button' => '.autosave-button',
@@ -53,7 +53,7 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     drupal_add_js(array('autosave_webform' => $settings), 'setting');
     drupal_add_css(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.css');
 
-    //add a button for save draft
+    // add a button for save draft
     $form['buttons']['autosave'] = array(
       '#prefix' => '<div id="autosave-webform-wrapper">',
       '#suffix' => '</div>',
@@ -79,11 +79,11 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     );
 
     if (empty($form_state['input']) && !empty($settings['auto-restore'])) {
-      //restore old data only when the form is not submitted
+      // restore old data only when the form is not submitted
       autosave_webform_restore($form, $form_state, $form_id);
     }
 
-    //add our own submit handler to clear the saved data after a submit
+    // add our own submit handler to clear the saved data after a submit
     if (empty($settings['no-submit-handler'])) {
       $form['#submit'][] = 'autosave_webform_form_submit';
     }
