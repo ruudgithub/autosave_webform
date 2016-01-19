@@ -48,7 +48,7 @@ function autosave_webform_node_delete($node) {
  */
 function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
-        //add the neccesary javascript
+        //add the necessary javascript
         $settings = array(
             'form_id' => str_replace('_', '-', $form_id),
             'autosave_button' => '.autosave-button',
