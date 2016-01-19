@@ -1,3 +1,11 @@
+/**
+ * @file
+ * This javascript provides the behaviour for autosaving webforms
+ *
+ * The file consist of two parts the first part attach the behaviour to drupal forms
+ * The second part is the class and functionality for saving
+ */
+
 (function ($) {
 
     Drupal.behaviors.autosaveWebform = {
@@ -14,38 +22,40 @@
 
 function autosave_webform_hide_save_message() {
     console.log("hide");
-    setTimeout(function() {
+    setTimeout(function () {
         console.log("hide");
         $(this).css("display", "none");
     }, 5000);
 }
 
-( function( $ ) {
+(function ($) {
 
-    $.autosave_webform = function() {
+    $.autosave_webform = function () {
         return $autosave_webform.getInstance();
     };
 
-    $.fn.autosave_webform = function( options ) {
+    $.fn.autosave_webform = function (options) {
         var autosave_webform = $autosave_webform.getInstance();
-        autosave_webform.setOptions( options );
-        autosave_webform.start( this );
+        autosave_webform.setOptions(options);
+        autosave_webform.start(this);
         return autosave_webform;
     };
 
-    $.fn.autosave_webform_show_message = function() {
+    $.fn.autosave_webform_show_message = function () {
         var el = $(this);
         el.css("display", "");
-        setTimeout(function() { el.css("display", "none"); }, 3000);
+        setTimeout(function () {
+            el.css("display", "none");
+        }, 3000);
     };
 
-    $autosave_webform = ( function() {
+    $autosave_webform = (function () {
         var params = {
             instantiated: null,
             started: null
         };
 
-        function init () {
+        function init() {
 
             return {
                 /**
@@ -78,55 +88,56 @@ function autosave_webform_hide_save_message() {
                     this.options = $.extend(this.options, options);
                 },
 
-                start: function(targets) {
+                start: function (targets) {
                     targets = targets || {};
                     var self = this;
                     this.targets = this.targets || [];
-                    this.targets = $.merge( this.targets, targets );
-                    this.targets = $.unique( this.targets );
-                    this.targets = $( this.targets );
-                    if ( ! params.started ) {
+                    this.targets = $.merge(this.targets, targets);
+                    this.targets = $.unique(this.targets);
+                    this.targets = $(this.targets);
+                    if (!params.started) {
                         params.started = true;
                         self.saveDataByTimeout();
                     }
                 },
 
-                saveAllData: function() {
+                saveAllData: function () {
                     var self = this;
                     $(self.options.autosave_button).mousedown();
 
-                    if ( $.isFunction( self.options.onSave ) ) {
+                    if ($.isFunction(self.options.onSave)) {
                         self.options.onSave.call();
                     }
                     self.saveDataByTimeout();
                 },
 
-                saveDataByTimeout: function() {
+                saveDataByTimeout: function () {
                     var self = this;
-                    setTimeout( ( function() {
+                    setTimeout((function () {
                         function timeout() {
                             self.saveAllData();
                         }
+
                         return timeout;
-                    } )(), self.options.timeout * 1000 );
+                    })(), self.options.timeout * 1000);
                 },
             };
         }
 
         return {
-            getInstance: function() {
-                if ( ! params.instantiated ) {
+            getInstance: function () {
+                if (!params.instantiated) {
                     params.instantiated = init();
                     params.instantiated.setInitialOptions();
                 }
                 return params.instantiated;
             },
 
-            free: function() {
+            free: function () {
                 params = {};
                 return null;
             }
         };
     })();
 
-} )( jQuery );
+})(jQuery);
