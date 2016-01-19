@@ -1,11 +1,11 @@
 /**
  * @file
- *
  * This javascript provides the behaviour for autosaving webforms.
  *
  * The file consist of two parts the first part attach the behaviour to drupal forms.
  * The second part is the class and functionality for saving.
  */
+
 (function () {
 
   "use strict";
