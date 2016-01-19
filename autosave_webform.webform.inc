@@ -155,7 +155,6 @@ function autosave_webform_form_webform_configure_form_submit(array &$form, array
 
 /**
  * Implements hook_node_insert().
- *
  */
 function _autosave_webform_webform_node_insert($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -170,7 +169,6 @@ function _autosave_webform_webform_node_insert($node) {
 
 /**
  * Implements hook_node_update().
- *
  */
 function _autosave_webform_webform_node_update($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -187,7 +185,6 @@ function _autosave_webform_webform_node_update($node) {
 
 /**
  * Implements hook_node_delete().
- *
  */
 function _autosave_webform_webform_node_delete($node) {
   if (isset($node->autosave_webform_enable)) {
