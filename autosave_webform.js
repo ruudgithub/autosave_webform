@@ -30,14 +30,13 @@
       function init() {
 
         return {
-          
           setInitialOptions: function (options) {
             var defaults = {
               timeout: 15,
               name: null,
               autosave_button: 'edit-autosave',
               onSave: function () {
-              },
+              }
             };
             this.options = this.options || $.extend(defaults, options);
           },
@@ -79,7 +78,7 @@
 
               return timeout;
             })(), self.options.timeout * 1000);
-          },
+          }
         };
       }
 
@@ -119,12 +118,12 @@
       }, 3000);
     };
 
-  })(jQuery);
+    function autosave_webform_hide_save_message() {
+      setTimeout(function () {
+        jQuery(this).css("display", "none");
+      }, 5000);
+    }
 
-  function autosave_webform_hide_save_message() {
-    setTimeout(function () {
-      $(this).css("display", "none");
-    }, 5000);
-  }
+  })(jQuery);
 
 })();
