@@ -78,7 +78,7 @@ function hook_autosavewebform_restore_alter(array &$form, $form_id, array &$form
  * @param array $data
  *    The data to be saved.
  */
-function hook_autosavewebform_save_alter(&$form, $form_id, &$form_state, &$data) {
+function hook_autosavewebform_save_alter(array &$form, $form_id, array &$form_state, array &$data) {
   if (isset($form_state['webform'])) {
     if (isset($form_state['values'])) {
       $data['values'] = $form_state['values'];
