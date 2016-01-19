@@ -124,7 +124,9 @@ function autosave_webform_form_webform_configure_form_alter(array &$form, array 
  * Deferred hook_node_load for webforms.
  *
  * @param array $nodes
+ *    Array of nodes.
  * @param array $types
+ *    Array of types.
  */
 function _autosave_webform_webform_node_load(array &$nodes, array $types) {
   $db = db_query('SELECT * FROM {autosave_webforms} WHERE nid IN(:nids)', array(':nids' => array_keys($nodes)));
@@ -138,8 +140,12 @@ function _autosave_webform_webform_node_load(array &$nodes, array $types) {
  * Deferred hook_webform_configure_form_submit.
  *
  * @param array $form
+ *    The form.
  * @param array $form_state
+ *    The form state.
+ *
  * @throws Exception
+ *    Throws an exception when node save fails.
  */
 function autosave_webform_form_webform_configure_form_submit(array &$form, array &$form_state)
 {
@@ -152,7 +158,9 @@ function autosave_webform_form_webform_configure_form_submit(array &$form, array
  * Deferred hook_webform_node_insert.
  *
  * @param object $node
+ *    The node.
  * @throws Exception
+ *   Throws an exception when node insert fails.
  */
 function _autosave_webform_webform_node_insert($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -169,8 +177,12 @@ function _autosave_webform_webform_node_insert($node) {
  * Deferred hook_webform_node_insert.
  *
  * @param object $node
+ *    The node.
+ *
  * @throws Exception
+ *    Throws an exception when updating fails.
  * @throws InvalidMergeQueryException
+ *    Throws an exception when merging fails.
  */
 function _autosave_webform_webform_node_update($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -189,6 +201,7 @@ function _autosave_webform_webform_node_update($node) {
  * Implements hook_node_delete().
  *
  * @param object $node
+ *    The node.
  */
 function _autosave_webform_webform_node_delete($node) {
   if (isset($node->autosave_webform_enable)) {
