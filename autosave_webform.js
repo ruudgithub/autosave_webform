@@ -25,21 +25,6 @@
       return $autosave_webform.getInstance();
     };
 
-    $.fn.autosave_webform = function (options) {
-      var autosave_webform = $autosave_webform.getInstance();
-      autosave_webform.setOptions(options);
-      autosave_webform.start(this);
-      return autosave_webform;
-    };
-
-    $.fn.autosave_webform_show_message = function () {
-      var el = $(this);
-      el.css("display", "");
-      setTimeout(function () {
-        el.css("display", "none");
-      }, 3000);
-    };
-
     $autosave_webform = (function () {
       var params = {
         instantiated: null,
@@ -49,6 +34,7 @@
       function init() {
 
         return {
+
           /**
            * Set plugin initial options
            *
@@ -131,11 +117,25 @@
       };
     })();
 
+    $.fn.autosave_webform = function (options) {
+      var autosave_webform = $autosave_webform.getInstance();
+      autosave_webform.setOptions(options);
+      autosave_webform.start(this);
+      return autosave_webform;
+    };
+
+    $.fn.autosave_webform_show_message = function () {
+      var el = $(this);
+      el.css("display", "");
+      setTimeout(function () {
+        el.css("display", "none");
+      }, 3000);
+    };
+
   })(jQuery);
 
   function autosave_webform_hide_save_message() {
     setTimeout(function () {
-      console.log("hide");
       $(this).css("display", "none");
     }, 5000);
   }
