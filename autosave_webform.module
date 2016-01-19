@@ -92,12 +92,32 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
   return $form;
 }
 
+/**
+ * Submit handler for forms.
+ *
+ * Clears the saved data
+ *
+ * @param array $form
+ *    The form.
+ * @param array $form_state
+ *    The form state.
+ */
 function autosave_webform_form_submit($form, &$form_state) {
   global $user;
   autosave_webform_clear_saved_data($form_state['build_info']['form_id'], $user->uid);
 }
 
-function autosave_webform_restore($form, &$form_state, $form_id) {
+/**
+ * Restore the previous saved values
+ *
+ * @param array $form
+ *    The form.
+ * @param array $form_state
+ *    The form state.
+ * @param string $form_id
+ *    The form id.
+ */
+function autosave_webform_restore(array $form, array &$form_state, $form_id) {
   global $user;
   $form_id = str_replace("-", "_", $form_id);
 
@@ -121,6 +141,14 @@ function autosave_webform_restore($form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Clears the saved data record.
+ *
+ * @param string $form_id
+ *    The form id.
+ * @param int $uid
+ *    The user ID.
+ */
 function autosave_webform_clear_saved_data($form_id, $uid) {
   $result = db_delete("autosave_webform_forms")
     ->condition('form_id', str_replace('-', '_', $form_id))
@@ -128,6 +156,17 @@ function autosave_webform_clear_saved_data($form_id, $uid) {
     ->execute();
 }
 
+/**
+ * Returns the previous saved data.
+ *
+ * @param string $form_id
+ *    The form id.
+ * @param int $uid
+ *    The user ID.
+ *
+ * @return array
+ *    Returns the saved data record.
+ */
 function autosave_webform_get_saved_data($form_id, $uid) {
   static $forms = array();
   if (empty($forms[$form_id][$uid])) {
@@ -140,7 +179,20 @@ function autosave_webform_get_saved_data($form_id, $uid) {
   return $forms[$form_id][$uid];
 }
 
-function autosave_webform_is_form_autosaveable($form, $form_id, $form_state) {
+/**
+ * Determines whether the form is enabled for autosaving.
+ *
+ * @param array $form
+ *    The form.
+ * @param string $form_id
+ *    The form id.
+ * @param array $form_state
+ *    The form state.
+ *
+ * @return array|bool
+ *    Returns false when the form is not saveable. Returns an array with settings when the form is saveable.
+ */
+function autosave_webform_is_form_autosaveable(array $form, $form_id, array $form_state) {
   $valid_form_ids = array();
 
   $valid_form_ids = module_invoke_all('autosavewebform_alter_autosaving_forms', $valid_form_ids, $form, $form_id, $form_state);
@@ -160,7 +212,18 @@ function autosave_webform_is_form_autosaveable($form, $form_id, $form_state) {
   return false;
 }
 
-function autosave_webform_ajax_callback($form, &$form_state) {
+/**
+ * Ajax callback for autosaving the form
+ *
+ * @param array $form
+ *    The form.
+ * @param array $form_state
+ *    The form state.
+ *
+ * @return array
+ *    Returns the javascript command to show the saved message.
+ */
+function autosave_webform_ajax_callback(array $form, array &$form_state) {
   autosave_webform_save($form, $form_state);
 
   $commands = array();
@@ -170,7 +233,15 @@ function autosave_webform_ajax_callback($form, &$form_state) {
 
 }
 
-function autosave_webform_save($form, &$form_state) {
+/**
+ * Save the form
+ *
+ * @param array $form
+ *    The form.
+ * @param array $form_state
+ *    The form state.
+ */
+function autosave_webform_save(array $form, array &$form_state) {
   global $user;
 
   $data = array();
