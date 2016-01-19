@@ -23,7 +23,7 @@
  * @param array $data
  *   The saved data.
  */
-function autosave_webform_autosavewebform_restore_alter(array &$form, array $form_id, array &$form_state, array $data) {
+function autosave_webform_autosavewebform_restore_alter(array &$form, $form_id, array &$form_state, array $data) {
   if (isset($form_state['webform'])) {
     if (isset($data['values'])) {
       $form_state['values'] = $data['values'];
@@ -51,7 +51,7 @@ function autosave_webform_autosavewebform_restore_alter(array &$form, array $for
  * @param array $data
  *   The saved data.
  */
-function autosave_webform_autosavewebform_save_alter(array &$form, array $form_id, array &$form_state, array &$data) {
+function autosave_webform_autosavewebform_save_alter(array &$form, $form_id, array &$form_state, array &$data) {
   if (isset($form_state['webform'])) {
     if (isset($form_state['values'])) {
       $data['values'] = $form_state['values'];
@@ -80,7 +80,7 @@ function autosave_webform_autosavewebform_save_alter(array &$form, array $form_i
  *   The form state.
  * @return array
  */
-function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, array $form, array $form_id, array $form_state) {
+function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $node = &$form['#node'];
   $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? TRUE : FALSE;
   if ($enabled) {
@@ -99,7 +99,7 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
  * @param array $form_state
  *   The form state.
  */
-function autosave_webform_form_webform_configure_form_alter(array &$form, array $form_state, array $form_id) {
+function autosave_webform_form_webform_configure_form_alter(array &$form, array $form_state, $form_id) {
   $node = &$form['#node'];
   $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? true : false;
 
