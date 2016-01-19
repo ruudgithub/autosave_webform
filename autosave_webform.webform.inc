@@ -147,8 +147,7 @@ function _autosave_webform_webform_node_load(array &$nodes, array $types) {
  * @throws Exception
  *    Throws an exception when node save fails.
  */
-function autosave_webform_form_webform_configure_form_submit(array &$form, array &$form_state)
-{
+function autosave_webform_form_webform_configure_form_submit(array &$form, array &$form_state) {
   $node = &$form['#node'];
   $node->autosave_webform_enable = $form_state['input']['autosave_webform_enable'] ? TRUE : FALSE;
   node_save($node);
@@ -157,10 +156,6 @@ function autosave_webform_form_webform_configure_form_submit(array &$form, array
 /**
  * Implements hook_node_insert().
  *
- * @param object $node
- *    The node.
- * @throws Exception
- *   Throws an exception when node insert fails.
  */
 function _autosave_webform_webform_node_insert($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -176,13 +171,6 @@ function _autosave_webform_webform_node_insert($node) {
 /**
  * Implements hook_node_update().
  *
- * @param object $node
- *    The node.
- *
- * @throws Exception
- *    Throws an exception when updating fails.
- * @throws InvalidMergeQueryException
- *    Throws an exception when merging fails.
  */
 function _autosave_webform_webform_node_update($node) {
   if (isset($node->autosave_webform_enable)) {
@@ -200,7 +188,6 @@ function _autosave_webform_webform_node_update($node) {
 /**
  * Implements hook_node_delete().
  *
- * @param object $node
  */
 function _autosave_webform_webform_node_delete($node) {
   if (isset($node->autosave_webform_enable)) {
