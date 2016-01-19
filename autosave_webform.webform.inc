@@ -155,7 +155,7 @@ function autosave_webform_form_webform_configure_form_submit(array &$form, array
 }
 
 /**
- * Deferred hook_webform_node_insert.
+ * Implements hook_node_insert().
  *
  * @param object $node
  *    The node.
@@ -174,7 +174,7 @@ function _autosave_webform_webform_node_insert($node) {
 }
 
 /**
- * Deferred hook_webform_node_insert.
+ * Implements hook_node_update().
  *
  * @param object $node
  *    The node.
@@ -201,7 +201,6 @@ function _autosave_webform_webform_node_update($node) {
  * Implements hook_node_delete().
  *
  * @param object $node
- *    The node.
  */
 function _autosave_webform_webform_node_delete($node) {
   if (isset($node->autosave_webform_enable)) {
