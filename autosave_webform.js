@@ -21,7 +21,7 @@
       }
     };
 
-    $autosave_webform = (function () {
+    var $autosave_webform = (function () {
       var params = {
         instantiated: null,
         started: null
@@ -35,7 +35,7 @@
            * Set plugin initial options
            *
            * @param [Object] options
-           * @return void
+           *  Options holds the different options
            */
           setInitialOptions: function (options) {
             var defaults = {
@@ -52,7 +52,7 @@
            * Set plugin options
            *
            * @param [Object] options
-           * @return void
+           *  Options holds the different options
            */
           setOptions: function (options) {
             this.options = this.options || this.setInitialOptions(options);
