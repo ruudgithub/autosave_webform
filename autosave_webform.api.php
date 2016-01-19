@@ -26,11 +26,11 @@
  *   Array containing valid form ids for autosaving.
  */
 function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
-    $forms['webform_client_form_1'] = array(
-        'no-submit-handler' => false, //set this to true when you don't want a clear saved data on the submitting of your form
-        'auto-restore' => true,   //set this to false if you don't want to autoload stored data on your form
-    );
-    return $forms;
+  $forms['webform_client_form_1'] = array(
+    'no-submit-handler' => false, //set this to true when you don't want a clear saved data on the submitting of your form
+    'auto-restore' => true,   //set this to false if you don't want to autoload stored data on your form
+  );
+  return $forms;
 }
 
 /**
@@ -48,17 +48,17 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
  *    The saved data.
  */
 function hook_autosavewebform_restore_alter(array &$form, $form_id, array &$form_state, array $data) {
-    if (isset($form_state['webform'])) {
-        if (isset($data['values'])) {
-            $form_state['values'] = $data['values'];
-        }
-        if (isset($data['webform'])) {
-            $form_state['webform'] = $data['webform'];
-        }
-        if (isset($data['storage'])) {
-            $form_state['storage'] = $data['storage'];
-        }
+  if (isset($form_state['webform'])) {
+    if (isset($data['values'])) {
+      $form_state['values'] = $data['values'];
     }
+    if (isset($data['webform'])) {
+      $form_state['webform'] = $data['webform'];
+    }
+    if (isset($data['storage'])) {
+      $form_state['storage'] = $data['storage'];
+    }
+  }
 }
 
 /**
@@ -76,15 +76,15 @@ function hook_autosavewebform_restore_alter(array &$form, $form_id, array &$form
  *    The data to be saved.
  */
 function hook_autosavewebform_save_alter(&$form, $form_id, &$form_state, &$data) {
-    if (isset($form_state['webform'])) {
-        if (isset($form_state['values'])) {
-            $data['values'] = $form_state['values'];
-        }
-        if (isset($form_state['webform'])) {
-            $data['webform'] = $form_state['webform'];
-        }
-        if (isset($form_state['storage'])) {
-            $data['storage'] = $form_state['storage'];
-        }
+  if (isset($form_state['webform'])) {
+    if (isset($form_state['values'])) {
+      $data['values'] = $form_state['values'];
     }
+    if (isset($form_state['webform'])) {
+      $data['webform'] = $form_state['webform'];
+    }
+    if (isset($form_state['storage'])) {
+      $data['storage'] = $form_state['storage'];
+    }
+  }
 }
