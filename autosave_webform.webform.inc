@@ -1,22 +1,23 @@
 <?php
 /**
  * @file
- *
  * This file contains the functionality to enable autosaving for webforms.
  *
  * @author Jaap Jansma (CiviCooP) <jaap.jansma@civicoop.org>
+ *
  * @license http://www.gnu.org/licenses/agpl-3.0.html
  */
 
 /**
  * Alter the form_state and form after a restore has taken place.
  *
- * The $data contains the restored data and can be used to alter the $form_state.
+ * The $data contains the restored data and can be used to
+ * alter the $form_state.
  *
- * @param $form
- * @param $form_id
- * @param $form_state
- * @param $data
+ * @param $form the form
+ * @param $form_id the form id
+ * @param $form_state the form state
+ * @param $data the saved data
  */
 function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form_state, $data) {
     if (isset($form_state['webform'])) {

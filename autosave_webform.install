@@ -7,55 +7,56 @@
 
 /**
  * Implements hook_schema()
-().
+ * ().
  */
-function autosave_webform_schema() {
-    return array(
-        'autosave_webforms' => array(
-            'description' => 'CiviCRM settings for individual Webform nodes.',
-            'fields' => array(
-                'nid' => array(
-                    'type' => 'int',
-                    'unsigned' => TRUE,
-                    'not null' => TRUE,
-                    'default' => 0,
-                    'description' => 'Webform Node ID',
-                ),
-                'autosave_webform_enable' => array(
-                    'type' => 'int',
-                    'size' => 'tiny',
-                    'not null' => TRUE,
-                    'default' => 0,
-                    'description' => 'Enabled autosaving for this webform'
-                ),
-            ),
-            'primary key' => array('nid'),
+function autosave_webform_schema()
+{
+  return array(
+    'autosave_webforms' => array(
+      'description' => 'CiviCRM settings for individual Webform nodes.',
+      'fields' => array(
+        'nid' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Webform Node ID',
         ),
-        'autosave_webform_forms' => array(
-            'description' => 'Saves the input (POST) contents of partially filled forms for restoration by the autosave webform module.',
-            'fields' => array(
-                'form_id' => array(
-                    'type'        => 'varchar',
-                    'length'      => 64,
-                    'not null'    => TRUE,
-                ),
-                'uid' => array(
-                    'type'        => 'int',
-                    'not null'    => TRUE,
-                    'default'     => 0,
-                ),
-                'timestamp' => array(
-                    'type'        => 'int',
-                    'not null'    => TRUE,
-                    'default'     => 0,
-                ),
-                'serialized' => array(
-                    'type'        => 'text',
-                    'not null'    => TRUE,
-                    'size'        => 'big',
-                ),
-            ),
-            'primary key' => array('form_id', 'uid'),
+        'autosave_webform_enable' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Enabled autosaving for this webform'
         ),
-    );
+      ),
+      'primary key' => array('nid'),
+    ),
+    'autosave_webform_forms' => array(
+      'description' => 'Saves the input (POST) contents of partially filled forms for restoration by the autosave webform module.',
+      'fields' => array(
+        'form_id' => array(
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+        ),
+        'uid' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'timestamp' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'serialized' => array(
+          'type' => 'text',
+          'not null' => TRUE,
+          'size' => 'big',
+        ),
+      ),
+      'primary key' => array('form_id', 'uid'),
+    ),
+  );
 }
