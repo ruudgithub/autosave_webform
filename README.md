@@ -13,8 +13,8 @@ available when he or she logs in from another computer.
 
 ## Technicall documentation
 
-If you want to implement the auto save functionality in your own module you have the 
-implement the following hooks:
+If you want to implement the auto save functionality in your own module you 
+have the implement the following hooks:
 
 * hook_autosavewebform_alter_autosaving_forms
 * hook_autosavewebform_restore_alter

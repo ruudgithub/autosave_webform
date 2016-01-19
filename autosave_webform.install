@@ -1,16 +1,13 @@
 <?php
 /**
  * @file
- *
  * This file contains the hooks for installation of this module.
  */
 
 /**
- * Implements hook_schema()
- * ().
+ * Implements hook_schema().
  */
-function autosave_webform_schema()
-{
+function autosave_webform_schema() {
   return array(
     'autosave_webforms' => array(
       'description' => 'CiviCRM settings for individual Webform nodes.',
@@ -27,7 +24,7 @@ function autosave_webform_schema()
           'size' => 'tiny',
           'not null' => TRUE,
           'default' => 0,
-          'description' => 'Enabled autosaving for this webform'
+          'description' => 'Enabled autosaving for this webform',
         ),
       ),
       'primary key' => array('nid'),
