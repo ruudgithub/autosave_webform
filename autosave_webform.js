@@ -21,10 +21,6 @@
       }
     };
 
-    $.autosave_webform = function () {
-      return $autosave_webform.getInstance();
-    };
-
     $autosave_webform = (function () {
       var params = {
         instantiated: null,
@@ -39,7 +35,6 @@
            * Set plugin initial options
            *
            * @param [Object] options
-           *
            * @return void
            */
           setInitialOptions: function (options) {
@@ -57,7 +52,6 @@
            * Set plugin options
            *
            * @param [Object] options
-           *
            * @return void
            */
           setOptions: function (options) {
@@ -116,6 +110,11 @@
         }
       };
     })();
+
+
+    $.autosave_webform = function () {
+      return $autosave_webform.getInstance();
+    };
 
     $.fn.autosave_webform = function (options) {
       var autosave_webform = $autosave_webform.getInstance();
