@@ -1,7 +1,7 @@
 # Drupal module autosave_webform
 Drupal module for automaticlly save drafts of a webform in Drupal.
 
-This module saves an open instance of a webform automaticly in the database. 
+This module saves an open instance of a webform automatically in the database. 
 When the user does not complete the form but does come back at a later moment the webform is prefilled with the data entered
 previously.
 
