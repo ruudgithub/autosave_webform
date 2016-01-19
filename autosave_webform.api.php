@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * This file contains the api documentation and example of the module autosave_webform.
+ * Contains the api documentation and example of the module autosave_webform.
  *
  * @author Jaap Jansma (CiviCooP) <jaap.jansma@civicoop.org>
  *
@@ -27,8 +27,11 @@
  */
 function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $forms['webform_client_form_1'] = array(
-    'no-submit-handler' => false, //set this to true when you don't want a clear saved data on the submitting of your form
-    'auto-restore' => true,   //set this to false if you don't want to autoload stored data on your form
+    //Set this to true when you don't want a clear saved
+    //data on the submitting of your form.
+    'no-submit-handler' => FALSE,
+    //Set this to false if you don't want to autoload stored data on your form.
+    'auto-restore' => TRUE,
   );
   return $forms;
 }
