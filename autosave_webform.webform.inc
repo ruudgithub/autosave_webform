@@ -80,7 +80,7 @@ function autosave_webform_autosavewebform_save_alter(array &$form, $form_id, arr
  *   The form state.
  *
  * @return array
- *  An array with valid form_ids.
+ *   An array with valid form_ids.
  */
 function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $node = &$form['#node'];
@@ -96,10 +96,10 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
  *
  * @param array $form
  *   The form.
- * @param string $form_id
- *   The form id.
  * @param array $form_state
  *   The form state.
+ * @param string $form_id
+ *   The form id.
  */
 function autosave_webform_form_webform_configure_form_alter(array &$form, array $form_state, $form_id) {
   $node = &$form['#node'];
@@ -135,7 +135,7 @@ function _autosave_webform_webform_node_load(array &$nodes, array $types) {
 }
 
 /**
- * Deferred hook_webform_configure_form_submit
+ * Deferred hook_webform_configure_form_submit.
  *
  * @param array $form
  * @param array $form_state
@@ -149,9 +149,9 @@ function autosave_webform_form_webform_configure_form_submit(array &$form, array
 }
 
 /**
- * Deferred hook_webform_node_insert
+ * Deferred hook_webform_node_insert.
  *
- * @param $node
+ * @param object $node
  * @throws Exception
  */
 function _autosave_webform_webform_node_insert($node) {
@@ -166,9 +166,9 @@ function _autosave_webform_webform_node_insert($node) {
 }
 
 /**
- * Deferred hook_webform_node_insert
- * 
- * @param $node
+ * Deferred hook_webform_node_insert.
+ *
+ * @param object $node
  * @throws Exception
  * @throws InvalidMergeQueryException
  */
@@ -185,7 +185,7 @@ function _autosave_webform_webform_node_update($node) {
   }
 }
 
-/*
+/**
  * Implements hook_node_delete().
  *
  * @param object $node
