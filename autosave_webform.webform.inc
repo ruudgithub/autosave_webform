@@ -14,10 +14,14 @@
  * The $data contains the restored data and can be used to
  * alter the $form_state.
  *
- * @param array $form The form.
- * @param string $form_id The form id.
- * @param array $form_state The form state.
- * @param array $data The saved data.
+ * @param array $form
+ *  The form.
+ * @param string $form_id
+ *  The form id.
+ * @param array $form_state
+ *  The form state.
+ * @param array $data
+ *  The saved data.
  */
 function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form_state, $data) {
   if (isset($form_state['webform'])) {
@@ -38,10 +42,14 @@ function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form
  *
  * You can use this hook to add additional data for storing.
  *
- * @param array $form The form.
- * @param string $form_id The form id.
- * @param array $form_state The form state.
- * @param array $data The saved data.
+ * @param array $form
+ *  The form.
+ * @param string $form_id
+ *  The form id.
+ * @param array $form_state
+ *  The form state.
+ * @param array $data
+ *  The saved data.
  */
 function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_state, &$data) {
   if (isset($form_state['webform'])) {
@@ -62,10 +70,14 @@ function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_st
  *
  * To enable alter saving at a form add the form_id to the array of $form.
  *
- * @param array $forms Array of form_ids.
- * @param array $form The form.
- * @param string $form_id The form id.
- * @param array $form_state The form state.
+ * @param array $forms
+ *  Array of form_ids.
+ * @param array $form
+ *  The form.
+ * @param string $form_id
+ *  The form id.
+ * @param array $form_state
+ *  The form state.
  * @return array
  */
 function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, $form_id, $form_state) {
@@ -80,9 +92,12 @@ function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, 
 /**
  * Adds a checkbox to webform settings page
  *
- * @param array $form The form.
- * @param string $form_id The form id.
- * @param array $form_state The form state.
+ * @param array $form
+ *  The form.
+ * @param string $form_id
+ *  The form id.
+ * @param array $form_state
+ *  The form state.
  */
 function autosave_webform_form_webform_configure_form_alter(&$form, $form_state, $form_id) {
   $node = &$form['#node'];
