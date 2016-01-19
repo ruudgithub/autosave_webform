@@ -39,7 +39,8 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
 /**
  * Alter the form_state and form after a restore has taken place.
  *
- * The $data contains the restored data and can be used to alter the $form_state.
+ * The $data contains the restored data and can be used
+ * to alter the $form_state.
  *
  * @param array $form
  *    The form.
