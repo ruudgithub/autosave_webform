@@ -19,8 +19,7 @@
  * @param $form_state the form state
  * @param $data the saved data
  */
-function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form_state, $data)
-{
+function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form_state, $data) {
   if (isset($form_state['webform'])) {
     if (isset($data['values'])) {
       $form_state['values'] = $data['values'];
@@ -44,8 +43,7 @@ function autosave_webform_autosavewebform_restore_alter(&$form, $form_id, &$form
  * @param $form_state the form state
  * @param $data the data to be saved
  */
-function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_state, &$data)
-{
+function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_state, &$data) {
   if (isset($form_state['webform'])) {
     if (isset($form_state['values'])) {
       $data['values'] = $form_state['values'];
@@ -70,8 +68,7 @@ function autosave_webform_autosavewebform_save_alter(&$form, $form_id, &$form_st
  * @param $form_state the form state
  * @return array
  */
-function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, $form_id, $form_state)
-{
+function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, $form_id, $form_state) {
   $node = &$form['#node'];
   $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? true : false;
   if ($enabled) {
@@ -87,8 +84,7 @@ function autosave_webform_autosavewebform_alter_autosaving_forms($forms, $form, 
  * @param $form_state the form state
  * @param $form_id the form id
  */
-function autosave_webform_form_webform_configure_form_alter(&$form, $form_state, $form_id)
-{
+function autosave_webform_form_webform_configure_form_alter(&$form, $form_state, $form_id) {
   $node = &$form['#node'];
   $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? true : false;
 
@@ -107,8 +103,7 @@ function autosave_webform_form_webform_configure_form_alter(&$form, $form_state,
   $form['#submit'][] = 'autosave_webform_form_webform_configure_form_submit';
 }
 
-function _autosave_webform_webform_node_load($nodes, $types)
-{
+function _autosave_webform_webform_node_load($nodes, $types) {
   $db = db_query('SELECT * FROM {autosave_webforms} WHERE nid IN(:nids)', array(':nids' => array_keys($nodes)));
   foreach ($db as $autosave_webform) {
     $node = &$nodes[$autosave_webform->nid];
@@ -123,8 +118,7 @@ function autosave_webform_form_webform_configure_form_submit(&$form, &$form_stat
   node_save($node);
 }
 
-function _autosave_webform_webform_node_insert($node)
-{
+function _autosave_webform_webform_node_insert($node) {
   if (isset($node->autosave_webform_enable)) {
     db_insert('autosave_webforms')
       ->fields(array(
@@ -135,8 +129,7 @@ function _autosave_webform_webform_node_insert($node)
   }
 }
 
-function _autosave_webform_webform_node_update($node)
-{
+function _autosave_webform_webform_node_update($node) {
   if (isset($node->autosave_webform_enable)) {
     db_merge('autosave_webforms')
       ->key(array(
@@ -154,8 +147,7 @@ function _autosave_webform_webform_node_update($node)
  *
  * @param object $node
  */
-function _autosave_webform_webform_node_delete($node)
-{
+function _autosave_webform_webform_node_delete($node) {
   if (isset($node->autosave_webform_enable)) {
     db_delete('autosave_webforms')
       ->condition('nid', $node->nid)
