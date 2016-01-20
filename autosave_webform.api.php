@@ -32,6 +32,11 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
     'no-submit-handler' => FALSE,
     // Set this to false if you don't want to autoload stored data on your form.
     'auto-restore' => TRUE,
+    // The timeout before saving the webform state.
+    'timeout' => 15,
+    // Set to false to disable #limit_validation_errors on the save draft button.
+    // On webforms you should set this to false because it gives notices.
+    'limit-validation-errors' => TRUE,
   );
   return $forms;
 }

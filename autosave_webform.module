@@ -42,12 +42,12 @@ function autosave_webform_node_delete($node) {
  * Implements hook_form_alter().
  */
 function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
-  if ($settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
+  if ($autosave_settings = autosave_webform_is_form_autosaveable($form, $form_id, $form_state)) {
     // Add the necessary javascript.
     $settings = array(
       'form_id' => str_replace('_', '-', $form_id),
       'autosave_button' => '.autosave-button',
-      'timeout' => 15,
+      'timeout' => $autosave_settings['timeout'],
     );
     drupal_add_js(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.js');
     drupal_add_js(array('autosave_webform' => $settings), 'setting');
@@ -62,7 +62,6 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'submit',
       '#value' => t('Save draft'),
       '#validate' => array(),
-      '#limit_validation_errors' => array(),
       '#attributes' => array(
         'class' => array('autosave-button'),
       ),
@@ -71,6 +70,11 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
         'callback' => 'autosave_webform_ajax_callback',
       ),
     );
+
+    if (!empty($autosave_settings['limit-validation-errors'])) {
+      $form['buttons']['autosave']['autosave_button']['#limit_validation_errors'] = array();
+    }
+
     $form['actions']['autosave_webform_message'] = array(
       '#prefix' => '<span id="autosave_webform_message" style="display: none;">',
       '#suffix' => '</span>',
@@ -78,13 +82,13 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
       '#weight' => 100,
     );
 
-    if (empty($form_state['input']) && !empty($settings['auto-restore'])) {
+    if (empty($form_state['input']) && !empty($autosave_settings['auto-restore'])) {
       // Restore old data only when the form is not submitted.
       autosave_webform_restore($form, $form_state, $form_id);
     }
 
     // Add our own submit handler to clear the saved data after a submit.
-    if (empty($settings['no-submit-handler'])) {
+    if (empty($autosave_settings['no-submit-handler'])) {
       $form['#submit'][] = 'autosave_webform_form_submit';
     }
   }
@@ -123,7 +127,6 @@ function autosave_webform_restore(array $form, array &$form_state, $form_id) {
 
   // Fetch the saved form, if any.
   $record = autosave_webform_get_saved_data($form_id, $user->uid);
-
   if ($record) {
     $data = unserialize($record->serialized);
     if (!is_array($data)) {
@@ -134,8 +137,8 @@ function autosave_webform_restore(array $form, array &$form_state, $form_id) {
     }
     if (isset($data['input'])) {
       $form_state['input'] = $data['input'];
+      $form_state['input']['form_token'] = drupal_get_token($form['#token']);
     }
-    $form_state['input']['form_token'] = drupal_get_token($form['#token']);
 
     drupal_alter('autosavewebform_restore', $form, $form_id, $form_state, $data);
   }
@@ -201,6 +204,8 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
   $defaults = array(
     'no-submit-handler' => FALSE,
     'auto-restore' => TRUE,
+    'timeout' => 15,
+    'limit-validation-errors' => TRUE,
   );
 
   if (isset($valid_form_ids[$form_id]) && is_array($valid_form_ids[$form_id])) {
