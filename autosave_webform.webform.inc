@@ -151,7 +151,7 @@ function _autosave_webform_webform_node_load(array &$nodes, array $types) {
  */
 function autosave_webform_form_webform_configure_form_submit(array &$form, array &$form_state) {
   $node = &$form['#node'];
-  $node->autosave_webform_enable = $form_state['input']['autosave_webform_enable'] ? TRUE : FALSE;
+  $node->autosave_webform_enable = $form_state['values']['autosave_webform_enable'] ? TRUE : FALSE;
   node_save($node);
 }
 
