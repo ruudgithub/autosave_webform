@@ -34,7 +34,8 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
     'auto-restore' => TRUE,
     // The timeout before saving the webform state.
     'timeout' => 15,
-    // Set to false to disable #limit_validation_errors on the save draft button.
+    // Set to false to disable #limit_validation_errors on
+    // the save draft button.
     // On webforms you should set this to false because it gives notices.
     'limit-validation-errors' => TRUE,
   );

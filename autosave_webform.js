@@ -118,12 +118,6 @@
       }, 3000);
     };
 
-    function autosave_webform_hide_save_message() {
-      setTimeout(function () {
-        jQuery(this).css("display", "none");
-      }, 5000);
-    }
-
   })(jQuery);
 
 })();
