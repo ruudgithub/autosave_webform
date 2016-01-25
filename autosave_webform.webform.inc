@@ -85,7 +85,11 @@ function autosave_webform_autosavewebform_save_alter(array &$form, $form_id, arr
 function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, array $form, $form_id, array $form_state) {
   $node = &$form['#node'];
   $enabled = isset($node->autosave_webform_enable) && $node->autosave_webform_enable ? TRUE : FALSE;
-  if ($enabled) {
+  $is_webform_client_form = FALSE;
+  if (stripos($form_id, 'webform_client_form_')===0) {
+    $is_webform_client_form = TRUE;
+  }
+  if ($enabled && $is_webform_client_form) {
     $forms[$form_id] = array(
       'limit-validation-errors' => FALSE,
     );
