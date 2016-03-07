@@ -27,12 +27,16 @@ function autosave_webform_autosavewebform_restore_alter(array &$form, $form_id, 
   if (isset($form_state['webform'])) {
     if (isset($data['values'])) {
       $form_state['values'] = $data['values'];
+      $form_state['rebuild'] = true;
     }
     if (isset($data['webform'])) {
       $form_state['webform'] = $data['webform'];
     }
     if (isset($data['storage'])) {
       $form_state['storage'] = $data['storage'];
+    }
+    if (isset($data['submitted'])) {
+      $form_state['submitted'] = $data['submitted'];
     }
   }
 }
@@ -61,6 +65,9 @@ function autosave_webform_autosavewebform_save_alter(array &$form, $form_id, arr
     }
     if (isset($form_state['storage'])) {
       $data['storage'] = $form_state['storage'];
+    }
+    if (isset($form_state['submitted'])) {
+      $data['submitted'] = $form_state['submitted'];
     }
   }
 }
