@@ -230,13 +230,19 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
  *    Returns the javascript command to show the saved message.
  */
 function autosave_webform_ajax_callback(array $form, array &$form_state) {
+  $form_id = $form_state['build_info']['form_id'];
+  $form_id = str_replace("_", "-", $form_id);
   autosave_webform_save($form, $form_state);
 
   $commands = array();
+  $commands[] = ajax_command_replace('form#'.$form_id, render($form));
   $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
   $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
   return array('#type' => 'ajax', '#commands' => $commands);
-
+  /*$form['actions']['autosave_webform_message']['#prefix'] = '<span id="autosave_webform_message" style="">';
+  $form['actions']['autosave_webform_message']['#suffix'] = '</span>';
+  $form['actions']['autosave_webform_message']['#markup'] = t('Saved as draft');
+  return $form;*/
 }
 
 /**
