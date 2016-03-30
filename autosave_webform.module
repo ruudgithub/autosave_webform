@@ -137,7 +137,10 @@ function autosave_webform_restore(array $form, array &$form_state, $form_id) {
     }
     if (isset($data['input'])) {
       $form_state['input'] = $data['input'];
-      $form_state['input']['form_token'] = drupal_get_token($form['#token']);
+      unset($form_state['input']['form_token']);
+      if (isset($form['#token'])) {
+        $form_state['input']['form_token'] = drupal_get_token($form['#token']);
+      }
     }
 
     drupal_alter('autosavewebform_restore', $form, $form_id, $form_state, $data);
@@ -230,19 +233,79 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
  *    Returns the javascript command to show the saved message.
  */
 function autosave_webform_ajax_callback(array $form, array &$form_state) {
-  $form_id = $form_state['build_info']['form_id'];
-  $form_id = str_replace("_", "-", $form_id);
   autosave_webform_save($form, $form_state);
 
   $commands = array();
-  $commands[] = ajax_command_replace('form#'.$form_id, render($form));
+  $replace = _autosave_webform_render_replace_on_save($form);
+  foreach($replace as $selector => $html) {
+    $commands[] = ajax_command_html($selector, $html);
+  }
   $commands[] = ajax_command_html('#autosave_webform_message', t('Saved as draft'));
   $commands[] = ajax_command_invoke('#autosave_webform_message', 'autosave_webform_show_message');
   return array('#type' => 'ajax', '#commands' => $commands);
-  /*$form['actions']['autosave_webform_message']['#prefix'] = '<span id="autosave_webform_message" style="">';
-  $form['actions']['autosave_webform_message']['#suffix'] = '</span>';
-  $form['actions']['autosave_webform_message']['#markup'] = t('Saved as draft');
-  return $form;*/
+}
+
+/**
+ * Returns an array of elements which should be replaced in the UI after saving
+ *
+ * The key of the array is the css selector (e.g. .form-iten-multifile-field-1)
+ * The value is the new html
+ *
+ * @param array $form
+ *   The form.
+ *
+ * @return array
+ *   Array with selectors as keys and html as values.
+ */
+function _autosave_webform_render_replace_on_save(array $form) {
+  $return = array();
+  foreach($form as $key => $element) {
+    if ($selector = _autosave_webform_replace_on_save($element)) {
+      $html = drupal_render($form);
+      $return[$selector] = $html;
+    } elseif (is_array($element)) {
+      $sub_return = _autosave_webform_render_replace_on_save($element);
+      $return = array_merge($return, $sub_return);
+    }
+  }
+  return $return;
+}
+
+/**
+ * Returns the key for replacing or false when element does not need replacement.
+ *
+ * @param mixed $element
+ *   The element.
+ *
+ * @return bool|string
+ *   The selector for replacement or false when element does not need replacement.
+ */
+function _autosave_webform_replace_on_save($element) {
+  if ($key = _autosave_webform_is_multifile($element)) {
+    return $key;
+  }
+  return false;
+}
+
+/**
+ * Checks whether the element is a multifile webform element.
+ *
+ * In case of a multifile element
+ *
+ * @param mixed $element
+ *   The element.
+ *
+ * @return bool|string
+ *   The selector for replacement or false when element does not need replacement.
+ */
+function _autosave_webform_is_multifile($element) {
+  if (is_array($element) && isset($element['#type']) && $element['#type'] == 'file' && isset($element['#webform_component']) && $element['#webform_component']['type'] == 'multifile') {
+    $key = $element['#webform_component']['form_key'];
+    $key = str_replace("_", "-", $key);
+    return '.webform-component--'.$key;
+
+  }
+  return false;
 }
 
 /**
