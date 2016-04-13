@@ -253,18 +253,21 @@ function autosave_webform_ajax_callback(array $form, array &$form_state) {
  *
  * @param array $form
  *   The form.
+ * @param array $parent_elements
+ *   The parent elements.
  *
  * @return array
  *   Array with selectors as keys and html as values.
  */
-function _autosave_webform_render_replace_on_save(array $form) {
+function _autosave_webform_render_replace_on_save(array $form, $parent_elements=array()) {
   $return = array();
+  $parent_elements[] = $form;
   foreach($form as $key => $element) {
-    if ($selector = _autosave_webform_replace_on_save($element)) {
+    if ($selector = _autosave_webform_replace_on_save($element, $parent_elements)) {
       $html = drupal_render($form);
       $return[$selector] = $html;
     } elseif (is_array($element)) {
-      $sub_return = _autosave_webform_render_replace_on_save($element);
+      $sub_return = _autosave_webform_render_replace_on_save($element, $parent_elements);
       $return = array_merge($return, $sub_return);
     }
   }
@@ -276,12 +279,14 @@ function _autosave_webform_render_replace_on_save(array $form) {
  *
  * @param mixed $element
  *   The element.
+ * @param array $parent_elements
+ *   The parent elements.
  *
  * @return bool|string
  *   The selector for replacement or false when element does not need replacement.
  */
-function _autosave_webform_replace_on_save($element) {
-  if ($key = _autosave_webform_is_multifile($element)) {
+function _autosave_webform_replace_on_save($element, $parent_elements) {
+  if ($key = _autosave_webform_is_multifile($element, $parent_elements)) {
     return $key;
   }
   return false;
@@ -294,15 +299,24 @@ function _autosave_webform_replace_on_save($element) {
  *
  * @param mixed $element
  *   The element.
+ * @param array $parent_elements
+ *   The parent elements.
  *
  * @return bool|string
  *   The selector for replacement or false when element does not need replacement.
  */
-function _autosave_webform_is_multifile($element) {
+function _autosave_webform_is_multifile($element, $parent_elements) {
   if (is_array($element) && isset($element['#type']) && $element['#type'] == 'file' && isset($element['#webform_component']) && $element['#webform_component']['type'] == 'multifile') {
-    $key = $element['#webform_component']['form_key'];
+    $keys = array();
+    foreach($parent_elements as $parent) {
+      if (isset($parent['#webform_component'])) {
+        $keys[] = '-'.$parent['#webform_component']['form_key'];
+      }
+    }
+    $key = implode("-", $keys);
     $key = str_replace("_", "-", $key);
-    return '.webform-component--'.$key;
+
+    return '.webform-component-'.$key;
 
   }
   return false;
