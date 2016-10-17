@@ -53,6 +53,12 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     drupal_add_js(array('autosave_webform' => $settings), 'setting');
     drupal_add_css(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.css');
 
+    // Add a hidden field with form hash for saving this form
+    $form['autosave_form_'.$form_id.'_hash'] = array(
+      '#type' => 'hidden',
+      '#value' => $autosave_settings['form_hash'],
+    );
+
     // Add a button for save draft.
     $form['buttons']['autosave'] = array(
       '#prefix' => '<div id="autosave-webform-wrapper">',
@@ -84,7 +90,7 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
 
     if (empty($form_state['input']) && !empty($autosave_settings['auto-restore'])) {
       // Restore old data only when the form is not submitted.
-      autosave_webform_restore($form, $form_state, $form_id);
+      autosave_webform_restore($form, $form_state, $form_id, $autosave_settings['form_hash']);
     }
 
     // Add our own submit handler to clear the saved data after a submit.
@@ -108,7 +114,9 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
  */
 function autosave_webform_form_submit(array $form, array &$form_state) {
   global $user;
-  autosave_webform_clear_saved_data($form_state['build_info']['form_id'], $user->uid);
+  $form_id = $form_state['build_info']['form_id'];
+  $form_hash = $form_state['input']['autosave_form_'.$form_id.'_hash'];
+  autosave_webform_clear_saved_data($form_id, $user->uid, $form_hash);
 }
 
 /**
@@ -120,13 +128,15 @@ function autosave_webform_form_submit(array $form, array &$form_state) {
  *    The form state.
  * @param string $form_id
  *    The form id.
+ * @param string $form_hash
+ *    The form hash
  */
-function autosave_webform_restore(array $form, array &$form_state, $form_id) {
+function autosave_webform_restore(array $form, array &$form_state, $form_id, $form_hash) {
   global $user;
   $form_id = str_replace("-", "_", $form_id);
 
   // Fetch the saved form, if any.
-  $record = autosave_webform_get_saved_data($form_id, $user->uid);
+  $record = autosave_webform_get_saved_data($form_id, $user->uid, $form_hash);
   if ($record) {
     $data = unserialize($record->serialized);
     if (!is_array($data)) {
@@ -154,11 +164,14 @@ function autosave_webform_restore(array $form, array &$form_state, $form_id) {
  *    The form id.
  * @param int $uid
  *    The user ID.
+ * @param string $form_hash
+ *    The unique form hash of the saved data.
  */
-function autosave_webform_clear_saved_data($form_id, $uid) {
+function autosave_webform_clear_saved_data($form_id, $uid, $form_hash) {
   $result = db_delete("autosave_webform_forms")
     ->condition('form_id', str_replace('-', '_', $form_id))
     ->condition('uid', $uid)
+    ->condition('form_hash', $form_hash)
     ->execute();
 }
 
@@ -169,17 +182,20 @@ function autosave_webform_clear_saved_data($form_id, $uid) {
  *    The form id.
  * @param int $uid
  *    The user ID.
+ * @param string $form_hash
+ *    The unique form hash of the saved data.
  *
  * @return array
  *    Returns the saved data record.
  */
-function autosave_webform_get_saved_data($form_id, $uid) {
+function autosave_webform_get_saved_data($form_id, $uid, $form_hash) {
   static $forms = array();
   if (empty($forms[$form_id][$uid])) {
     // Fetch the saved form, if any.
-    $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid", array(
+    $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid AND form_hash = :form_hash", array(
       ':form_id' => str_replace('-', '_', $form_id),
       ':uid' => $uid,
+      ':form_hash' => $form_hash,
     ))->fetchObject();
   }
   return $forms[$form_id][$uid];
@@ -209,6 +225,7 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
     'auto-restore' => TRUE,
     'timeout' => 15,
     'limit-validation-errors' => TRUE,
+    'form_hash' => '',
   );
 
   if (isset($valid_form_ids[$form_id]) && is_array($valid_form_ids[$form_id])) {
@@ -334,14 +351,17 @@ function autosave_webform_save(array $form, array &$form_state) {
   global $user;
 
   $data = array();
-  $data['input'] = $form_state['input'];
   $form_id = $form_state['build_info']['form_id'];
+  $form_hash = $form_state['input']['autosave_form_'.$form_id.'_hash'];
+  $data['input'] = $form_state['input'];
+  unset($data['input']['autosave_form_'.$form_id.'_hash']);
 
   drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
 
   db_merge('autosave_webform_forms')->key(array(
     'form_id' => $form_id,
     'uid' => $user->uid,
+    'form_hash' => $form_hash,
   ))
     ->fields(array(
       'timestamp' => time(),

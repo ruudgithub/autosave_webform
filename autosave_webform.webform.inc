@@ -99,6 +99,7 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
   if ($enabled && $is_webform_client_form) {
     $forms[$form_id] = array(
       'limit-validation-errors' => FALSE,
+      'form_hash' => sha1(request_uri()), // Use an unique key for saving webforms.
     );
   }
   return $forms;

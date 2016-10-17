@@ -38,6 +38,9 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
     // the save draft button.
     // On webforms you should set this to false because it gives notices.
     'limit-validation-errors' => TRUE,
+    // Set a hash for this form. You can use this when a form has url parameters and should be taken into account
+    // for saving.
+    'form_hash' => '',
   );
   return $forms;
 }

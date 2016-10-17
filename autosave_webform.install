@@ -42,6 +42,12 @@ function autosave_webform_schema() {
           'not null' => TRUE,
           'default' => 0,
         ),
+        'form_hash' => array(
+          'type' => 'varchar',
+          'not null' => true,
+          'length' => 128,
+          'default' => '',
+        ),
         'timestamp' => array(
           'type' => 'int',
           'not null' => TRUE,
@@ -57,3 +63,15 @@ function autosave_webform_schema() {
     ),
   );
 }
+
+function autosave_webform_update_7101() {
+  db_add_field('autosave_webform_forms', 'form_hash', array(
+    'type' => 'varchar',
+    'not null' => true,
+    'length' => 128,
+    'default' => '',
+  ));
+
+  return t('Add a key column to autosave webforms.');
+}
+
