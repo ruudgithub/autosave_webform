@@ -59,7 +59,7 @@ function autosave_webform_schema() {
           'size' => 'big',
         ),
       ),
-      'primary key' => array('form_id', 'uid'),
+      'primary key' => array('form_id', 'uid', 'form_hash'),
     ),
   );
 }
@@ -75,3 +75,9 @@ function autosave_webform_update_7101() {
   return t('Add a key column to autosave webforms.');
 }
 
+function autosave_webform_update_7102() {
+  db_drop_primary_key('autosave_webform_forms');
+  db_add_primary_key('autosave_webform_forms', array('form_id', 'uid', 'form_hash'));
+
+  return t('Redefined Primary key.');
+}
