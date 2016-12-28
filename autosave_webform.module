@@ -47,6 +47,7 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     $settings = array(
       'form_id' => str_replace('_', '-', $form_id),
       'autosave_button' => '.autosave-button',
+      'autosave_button_id' => 'edit-autosave-button',
       'timeout' => $autosave_settings['timeout'],
     );
     drupal_add_js(drupal_get_path('module', 'autosave_webform') . '/autosave_webform.js');
@@ -97,6 +98,8 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     if (empty($autosave_settings['no-submit-handler'])) {
       $form['#submit'][] = 'autosave_webform_form_submit';
     }
+
+    $form['#attributes']['class'][] = 'autosave-webform';
   }
 
   return $form;
@@ -192,7 +195,7 @@ function autosave_webform_get_saved_data($form_id, $uid, $form_hash) {
   static $forms = array();
   if (empty($forms[$form_id][$uid])) {
     // Fetch the saved form, if any.
-    $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid AND form_hash = :form_hash", array(
+    $forms[$form_id][$uid] = db_query("SELECT form_id, serialized, timestamp FROM {autosave_webform_forms} WHERE form_id = :form_id AND uid = :uid AND form_hash = :form_hash ORDER BY `timestamp` DESC LIMIT 1", array(
       ':form_id' => str_replace('-', '_', $form_id),
       ':uid' => $uid,
       ':form_hash' => $form_hash,
@@ -358,12 +361,11 @@ function autosave_webform_save(array $form, array &$form_state) {
 
   drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
 
-  db_merge('autosave_webform_forms')->key(array(
-    'form_id' => $form_id,
-    'uid' => $user->uid,
-    'form_hash' => $form_hash,
-  ))
+  db_insert('autosave_webform_forms')
     ->fields(array(
+      'form_id' => $form_id,
+      'uid' => $user->uid,
+      'form_hash' => $form_hash,
       'timestamp' => time(),
       'serialized' => serialize($data),
     ))

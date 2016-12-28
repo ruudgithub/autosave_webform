@@ -14,6 +14,33 @@
     Drupal.behaviors.autosaveWebform = {
       attach: function (context, settings) {
         if (Drupal.settings.autosave_webform.form_id) {
+
+          /**
+           * Override default error handling so that when a request is in progress and the user
+           * leaves the form he or she won't see a popup about a failing ajax request.
+           *
+           * @param response
+           * @param uri
+           */
+          Drupal.ajax[Drupal.settings.autosave_webform.autosave_button_id].error = function (response, uri) {
+            // Remove the progress element.
+            if (this.progress.element) {
+              $(this.progress.element).remove();
+            }
+            if (this.progress.object) {
+              this.progress.object.stopMonitoring();
+            }
+            // Undo hide.
+            $(this.wrapper).show();
+            // Re-enable the element.
+            $(this.element).removeClass('progress-disabled').removeAttr('disabled');
+            // Reattach behaviors, if they were detached in beforeSerialize().
+            if (this.form) {
+              var settings = response.settings || this.settings || Drupal.settings;
+              Drupal.attachBehaviors(this.form, settings);
+            }
+          };
+
           jQuery('#' + Drupal.settings.autosave_webform.form_id).autosave_webform({
             timeout: Drupal.settings.autosave_webform.timeout,
             autosave_button: Drupal.settings.autosave_webform.autosave_button
