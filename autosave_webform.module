@@ -96,7 +96,11 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
 
     // Add our own submit handler to clear the saved data after a submit.
     if (empty($autosave_settings['no-submit-handler'])) {
-      $form['#submit'][] = 'autosave_webform_form_submit';
+      $submit_function = 'autosave_webform_form_submit';
+      if (!empty($autosave_settings['submit_function'])) {
+        $submit_function = $autosave_settings['submit_function'];
+      }
+      $form['#submit'][] = $submit_function;
     }
 
     $form['#attributes']['class'][] = 'autosave-webform';
@@ -225,6 +229,7 @@ function autosave_webform_is_form_autosaveable(array $form, $form_id, array $for
 
   $defaults = array(
     'no-submit-handler' => FALSE,
+    'submit_function' => 'autosave_webform_form_submit',
     'auto-restore' => TRUE,
     'timeout' => 15,
     'limit-validation-errors' => TRUE,

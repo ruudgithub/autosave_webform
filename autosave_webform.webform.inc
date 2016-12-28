@@ -100,9 +100,32 @@ function autosave_webform_autosavewebform_alter_autosaving_forms(array $forms, a
     $forms[$form_id] = array(
       'limit-validation-errors' => FALSE,
       'form_hash' => sha1(request_uri()), // Use an unique key for saving webforms.
+      'submit_function' => 'autosave_webform_autosavewebform_submit',
     );
   }
   return $forms;
+}
+
+/**
+ * Submit handler for forms.
+ *
+ * Clears the saved data.
+ *
+ * @param array $form
+ *    The form.
+ * @param array $form_state
+ *    The form state.
+ */
+function autosave_webform_autosavewebform_submit(array $form, array &$form_state) {
+  global $user;
+  // Check whether the submit button is pressed and not the button for next and previous pages
+  $submit_op = !empty($form['actions']['submit']['#value']) ? $form['actions']['submit']['#value'] : t('Submit');
+  if ($form_state['values']['op'] == $submit_op) {
+    // Only clear results on submit
+    $form_id = $form_state['build_info']['form_id'];
+    $form_hash = $form_state['input']['autosave_form_'.$form_id.'_hash'];
+    autosave_webform_clear_saved_data($form_id, $user->uid, $form_hash);
+  }
 }
 
 /**

@@ -30,6 +30,8 @@ function hook_autosavewebform_alter_autosaving_forms(array $forms, array $form, 
     // Set this to true when you don't want a clear saved
     // data on the submitting of your form.
     'no-submit-handler' => FALSE,
+    // Submit function to clear the stored data
+    'submit_function' => 'autosave_webform_form_submit',
     // Set this to false if you don't want to autoload stored data on your form.
     'auto-restore' => TRUE,
     // The timeout before saving the webform state.
