@@ -81,7 +81,16 @@ function autosave_webform_form_alter(&$form, &$form_state, $form_id) {
     if (!empty($autosave_settings['limit-validation-errors'])) {
       $form['buttons']['autosave']['autosave_button']['#limit_validation_errors'] = array();
     }
-
+		$form['actions']['clear'] = array(
+			'#type' => 'submit',
+			'#value' => t('Clear form data'),
+			'#weight' => -10,
+	    '#submit' => array("autosave_webform_clear_submit"),
+	    '#validate' => '',
+    	'#attributes' => array(
+      	'formnovalidate' => "formnovalidate",
+    	),
+		);
     $form['actions']['autosave_webform_message'] = array(
       '#prefix' => '<span id="autosave_webform_message" style="display: none;">',
       '#suffix' => '</span>',
@@ -124,6 +133,16 @@ function autosave_webform_form_submit(array $form, array &$form_state) {
   $form_id = $form_state['build_info']['form_id'];
   $form_hash = $form_state['input']['autosave_form_'.$form_id.'_hash'];
   autosave_webform_clear_saved_data($form_id, $user->uid, $form_hash);
+}
+
+/**
+ * Submit function to clear saved submission.
+ */
+function autosave_webform_clear_submit(array $form, array &$form_state) {
+	global $user;
+  $form_id = $form_state['build_info']['form_id'];
+  $form_hash = $form_state['input']['autosave_form_'.$form_id.'_hash'];
+	autosave_webform_clear_saved_data($form_id, $user->uid, $form_hash);
 }
 
 /**
