@@ -6,3 +6,5 @@ version = 1.5
 dependencies[] = jquery_update
 
 core = 7.x
+
+configure = admin/config/content/webform/autosave

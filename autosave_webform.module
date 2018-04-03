@@ -11,6 +11,26 @@
 require_once 'autosave_webform.webform.inc';
 
 /**
+ * Implements hook_menu()
+ *
+ */
+function autosave_webform_menu() {
+  $items = array();
+
+  $items['admin/config/content/webform/autosave'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Webform autosave settings',
+    'description' => 'Configuration for autosave_webform module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('autosave_webform_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'autosave_webform.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_node_load().
  */
 function autosave_webform_node_load($nodes, $types) {
@@ -385,13 +405,109 @@ function autosave_webform_save(array $form, array &$form_state) {
 
   drupal_alter('autosavewebform_save', $form, $form_id, $form_state, $data);
 
-  db_insert('autosave_webform_forms')
-    ->fields(array(
-      'form_id' => $form_id,
-      'uid' => $user->uid,
-      'form_hash' => $form_hash,
-      'timestamp' => time(),
-      'serialized' => serialize($data),
-    ))
-    ->execute();
+  $t = db_transaction();
+  try {
+    $num_updated = db_update('autosave_webform_forms')
+                    ->fields(array(
+                      'timestamp' => time(),
+                      'serialized' => serialize($data),
+                    ))
+                    ->condition('form_id', $form_id, '=')
+                    ->condition('uid', $user->uid, '=')
+                    ->condition('form_hash', $form_hash,'=')
+                    ->execute();
+  } catch (Exception $e) {
+    $num_updated = 0;
+    $t->rollBack();
+  }
+
+  if ($num_updated == 0) {
+    $t = db_transaction();
+    try {
+      db_insert('autosave_webform_forms')
+        ->fields(array(
+          'form_id' => $form_id,
+          'uid' => $user->uid,
+          'form_hash' => $form_hash,
+          'timestamp' => time(),
+          'serialized' => serialize($data),
+        ))
+        ->execute();
+    } catch (Exception $e) {
+      $num_updated = 0;
+      $t->rollBack();
+    }
+  }
+}
+
+/**
+ * Implements hook_cron()
+ *
+ * Cleanup saved webform data older then 3 months
+ * The query runs at most once a day (or less if cron is scheduled less regularly)
+ */
+function autosave_webform_cron() {
+  //Get cron last run date
+  $lastrun_cron = variable_get('cron_last')?variable_get('cron_last'):'';
+  $lastrun_date = date('Ymd',$lastrun_cron);
+  $current_date = date('Ymd');
+
+  $autoremove_active = variable_get('autosave_webform_autoremovedataactive')?variable_get('autosave_webform_autoremovedataactive'):0;
+
+  $table_name = 'autosave_webform_forms';
+
+  //Make sure this cron job runs at most once a day
+  if ($autoremove_active == TRUE && ($current_date > $lastrun_date)) {
+    $t = db_transaction();
+    try {
+      //Delete all autosave information older then 90 days (about 3 months), used days to make it a fixed time frame for odd and even months
+      $period = variable_get('autosave_webform_autoremoveperiod')?variable_get('autosave_webform_autoremoveperiod'):'3';
+
+      switch($period) {
+        case 1:
+          db_delete($table_name)->condition('timestamp', strtotime('-30 days'),'<')->execute();
+          break;
+        case 3:
+          db_delete($table_name)->condition('timestamp', strtotime('-90 days'),'<')->execute();
+          break;
+        case 6:
+          db_delete($table_name)->condition('timestamp', strtotime('-180 days'),'<')->execute();
+          break;
+        case 12:
+          db_delete($table_name)->condition('timestamp', strtotime('-1 year'),'<')->execute();
+          break;
+        default:
+          db_delete($table_name)->condition('timestamp', strtotime('-90 days'),'<')->execute();
+          break;
+      }
+    } catch (Exception $e) {
+      $t->rollBack();
+      watchdog(basename(__FILE__), $e, NULL, WATCHDOG_ERROR, '');
+    }
+
+    $t = db_transaction();
+    try {
+      if (db_driver() == 'mysql') {
+        try {
+          db_query("OPTIMIZE TABLE {$table_name}")->execute();
+        }
+        catch (Exception $e) {
+          watchdog_exception('type', $e);
+        }
+      }
+      elseif (db_driver() == 'pgsql') {
+        try {
+          db_query("VACUUM ANALYZE {$table_name}")->execute();
+        }
+        catch (Exception $e) {
+          watchdog_exception('type', $e);
+        }
+      }
+    } catch (Exception $e) {
+      $t->rollBack();
+      watchdog(basename(__FILE__), $e, NULL, WATCHDOG_ERROR, '');
+    }
+  } else {
+    //same day so nothing to do
+  }
 }
